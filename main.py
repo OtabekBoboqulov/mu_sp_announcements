@@ -9,7 +9,7 @@ import os
 
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 if not BOT_TOKEN:
-    raise ValueError("No BOT_TOKEN environment variable found!")
+    BOT_TOKEN = '7757218255:AAGbCKc1W3NZuwy43iP_D0vNAaWh0NS7iWg'
 
 
 # Set up logging
