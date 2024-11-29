@@ -17,7 +17,7 @@ async def add_group(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     if chat.type in ['group', 'supergroup']:
         group_ids.add(chat.id)
-        await update.message.reply_text(f"This group (ID: {chat.id}) has been registered.")
+        await update.message.reply_text(greeting_message)
 
 
 # Function to check if the user is the bot's admin
@@ -42,7 +42,7 @@ async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
                     # Create an inline keyboard button
                     keyboard = InlineKeyboardMarkup([
-                        [InlineKeyboardButton(f"Click Me! (0)", callback_data=callback_key)]
+                        [InlineKeyboardButton("✔", callback_data=callback_key)]
                     ])
 
                     # Send the photo with the button
@@ -76,7 +76,7 @@ async def handle_video(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
                     # Create an inline keyboard button
                     keyboard = InlineKeyboardMarkup([
-                        [InlineKeyboardButton(f"Click Me! (0)", callback_data=callback_key)]
+                        [InlineKeyboardButton("✔", callback_data=callback_key)]
                     ])
 
                     # Send the video with the button
@@ -109,7 +109,7 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
                     # Create an inline keyboard button
                     keyboard = InlineKeyboardMarkup([
-                        [InlineKeyboardButton(f"✔", callback_data=callback_key)]
+                        [InlineKeyboardButton("✔", callback_data=callback_key)]
                     ])
 
                     # Send the text with the button
