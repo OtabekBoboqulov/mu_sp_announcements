@@ -8,7 +8,7 @@ group_ids = set()
 click_counts = {}
 
 # Bot's admin ID (replace with the actual bot admin's user ID)
-BOT_ADMIN_IDs = [6426448705, 2024249696]  # Replace with the admin user ID (numeric)
+BOT_ADMIN_IDs = [6426448705, 2024249696] # Replace with the admin user ID (numeric)
 
 greeting_message = 'Assalomu aleykum. I am an official SP bot of Millat Umidi University.'
 
@@ -109,7 +109,7 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
                     # Create an inline keyboard button
                     keyboard = InlineKeyboardMarkup([
-                        [InlineKeyboardButton("✔", callback_data=callback_key)]
+                        [InlineKeyboardButton(f"✔", callback_data=callback_key)]
                     ])
 
                     # Send the text with the button
@@ -125,27 +125,61 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("You are not the bot's admin and cannot send messages.")
 
 
+# Global dictionaries to track clicks and users
+global_click_counts = {}  # Tracks total click counts for each button
+global_click_users = {}   # Tracks users who clicked each button globally
+
 # Function to handle button clicks
 async def button_click(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
-    await query.answer()  # Acknowledge the callback query
-
-    # Extract the callback data
+    user_id = query.from_user.id
     callback_data = query.data
 
-    # Increment the click count for this button
-    if callback_data in click_counts:
-        click_counts[callback_data] += 1
-        count = click_counts[callback_data]
+    await query.answer()  # Acknowledge the callback query
 
-        # Update the button text with the new count
-        keyboard = InlineKeyboardMarkup([
-            [InlineKeyboardButton(f"✔ {count}", callback_data=callback_data)]
-        ])
-        try:
-            await query.edit_message_reply_markup(reply_markup=keyboard)
-        except Exception as e:
-            print(f"Failed to update button: {e}")
+    # Initialize tracking for this button globally
+    if callback_data not in global_click_users:
+        global_click_users[callback_data] = set()  # Set of users who clicked
+        global_click_counts[callback_data] = 0     # Total click count
+
+    # Check if the user has already clicked this button globally
+    if user_id in global_click_users[callback_data]:
+        await query.answer("You can only click once across all groups!", show_alert=True)
+        return 1
+
+    # Add the user to the global set of users who clicked
+    global_click_users[callback_data].add(user_id)
+
+    # Increment the global click count
+    global_click_counts[callback_data] += 1
+    count = global_click_counts[callback_data]
+
+    # Update the button text with the new count globally
+    keyboard = InlineKeyboardMarkup([
+        [InlineKeyboardButton(f"✔ {count}", callback_data=callback_data)]
+    ])
+    try:
+        await query.edit_message_reply_markup(reply_markup=keyboard)
+    except Exception as e:
+        print(f"Failed to update button: {e}")
+
+
+# Function to display button press statistics to the bot's admin
+async def show_stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_id = update.message.from_user.id
+
+    # Check if the user is the bot's admin
+    if await is_bot_admin(user_id):
+        if global_click_counts:
+            stats_message = "Button Press Statistics:\n\n"
+            for callback_data, count in global_click_counts.items():
+                stats_message += f"{callback_data}: {count} presses\n"
+            await update.message.reply_text(stats_message)
+        else:
+            await update.message.reply_text("No button press data available yet.")
+    else:
+        await update.message.reply_text("You are not authorized to view statistics.")
+
 
 
 # Start command for the bot
@@ -157,7 +191,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 # Main function to start the bot
 def main():
-    TOKEN = "7757218255:AAGbCKc1W3NZuwy43iP_D0vNAaWh0NS7iWg"
+    TOKEN = "7452082294:AAFV6mapK6f4Vf3vdiZOYBW_EbhxBaVhi6c"
     app = Application.builder().token(TOKEN).build()
 
     # Register handlers
@@ -167,6 +201,7 @@ def main():
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_text))  # Text handler
     app.add_handler(MessageHandler(filters.ChatType.GROUPS & filters.StatusUpdate.NEW_CHAT_MEMBERS, add_group))
     app.add_handler(CallbackQueryHandler(button_click))  # Handle button clicks
+    app.add_handler(CommandHandler("stats", show_stats))  # Add the stats command
 
     # Run the bot
     app.run_polling()
@@ -174,3 +209,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+#699475942708
