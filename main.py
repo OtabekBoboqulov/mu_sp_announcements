@@ -191,7 +191,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 # Main function to start the bot
 def main():
-    TOKEN = "7452082294:AAFV6mapK6f4Vf3vdiZOYBW_EbhxBaVhi6c"
+    TOKEN = "7757218255:AAGbCKc1W3NZuwy43iP_D0vNAaWh0NS7iWg"
     app = Application.builder().token(TOKEN).build()
 
     # Register handlers
