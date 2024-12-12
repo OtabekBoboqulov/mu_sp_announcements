@@ -8,7 +8,7 @@ group_ids = set()
 click_counts = {}
 
 # Bot's admin ID (replace with the actual bot admin's user ID)
-BOT_ADMIN_IDs = [6426448705, 2024249696] # Replace with the admin user ID (numeric)
+BOT_ADMIN_IDs = [6426448705, 2024249696]  # Replace with the admin user ID (numeric)
 
 greeting_message = 'Assalomu aleykum. I am an official SP bot of Millat Umidi University.'
 
@@ -28,9 +28,10 @@ async def is_bot_admin(user_id: int) -> bool:
 # Function to handle photos (with optional captions) sent to the bot
 async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.message.from_user.id
+    chat_type = update.effective_chat.type
 
-    # Check if the user is the bot's admin
-    if await is_bot_admin(user_id):
+    # Only process messages from personal chat sent by the admin
+    if chat_type == 'private' and await is_bot_admin(user_id):
         if group_ids:
             photo = update.message.photo[-1]  # Get the highest resolution photo
             caption = update.message.caption or ""  # Optional caption
@@ -42,7 +43,7 @@ async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
                     # Create an inline keyboard button
                     keyboard = InlineKeyboardMarkup([
-                        [InlineKeyboardButton("✔", callback_data=callback_key)]
+                        [InlineKeyboardButton("\u2714", callback_data=callback_key)]
                     ])
 
                     # Send the photo with the button
@@ -56,15 +57,16 @@ async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
         else:
             await update.message.reply_text("No groups have been registered yet.")
     else:
-        await update.message.reply_text("You are not the bot's admin and cannot send messages.")
+        await update.message.reply_text("You are not authorized to send messages.")
 
 
 # Function to handle videos (with optional captions) sent to the bot
 async def handle_video(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.message.from_user.id
+    chat_type = update.effective_chat.type
 
-    # Check if the user is the bot's admin
-    if await is_bot_admin(user_id):
+    # Only process messages from personal chat sent by the admin
+    if chat_type == 'private' and await is_bot_admin(user_id):
         if group_ids:
             video = update.message.video  # Get the video file
             caption = update.message.caption or ""  # Optional caption
@@ -76,7 +78,7 @@ async def handle_video(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
                     # Create an inline keyboard button
                     keyboard = InlineKeyboardMarkup([
-                        [InlineKeyboardButton("✔", callback_data=callback_key)]
+                        [InlineKeyboardButton("\u2714", callback_data=callback_key)]
                     ])
 
                     # Send the video with the button
@@ -90,15 +92,16 @@ async def handle_video(update: Update, context: ContextTypes.DEFAULT_TYPE):
         else:
             await update.message.reply_text("No groups have been registered yet.")
     else:
-        await update.message.reply_text("You are not the bot's admin and cannot send messages.")
+        await update.message.reply_text("You are not authorized to send messages.")
 
 
 # Function to handle text messages sent to the bot
 async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.message.from_user.id
+    chat_type = update.effective_chat.type
 
-    # Check if the user is the bot's admin
-    if await is_bot_admin(user_id):
+    # Only process messages from personal chat sent by the admin
+    if chat_type == 'private' and await is_bot_admin(user_id):
         if group_ids:
             text = update.message.text
             for group_id in group_ids:
@@ -109,7 +112,7 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
                     # Create an inline keyboard button
                     keyboard = InlineKeyboardMarkup([
-                        [InlineKeyboardButton(f"✔", callback_data=callback_key)]
+                        [InlineKeyboardButton("\u2714", callback_data=callback_key)]
                     ])
 
                     # Send the text with the button
@@ -122,7 +125,7 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
         else:
             await update.message.reply_text("No groups have been registered yet.")
     else:
-        await update.message.reply_text("You are not the bot's admin and cannot send messages.")
+        pass
 
 
 # Global dictionaries to track clicks and users
@@ -156,7 +159,7 @@ async def button_click(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # Update the button text with the new count globally
     keyboard = InlineKeyboardMarkup([
-        [InlineKeyboardButton(f"✔ {count}", callback_data=callback_data)]
+        [InlineKeyboardButton(f"\u2714 {count}", callback_data=callback_data)]
     ])
     try:
         await query.edit_message_reply_markup(reply_markup=keyboard)
